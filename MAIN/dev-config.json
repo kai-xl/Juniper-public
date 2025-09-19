@@ -1,0 +1,5 @@
+{
+  "skipStartupScreens": true,
+  "showDevTools": false,
+  "defaultPage": "tags"
+}

@@ -1,2 +1,2 @@
-# Juniper-public
-for public viewing
+# JUNIPER
+tbd (public)

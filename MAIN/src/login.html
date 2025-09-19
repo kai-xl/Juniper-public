@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juniper - Start Organizing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Theme Variables - Matching existing design */
+            --primary-purple: #8B5CF6;
+            --light-purple: #A78BFA;
+            --accent-purple: #C084FC;
+            --purple-glow: rgba(139, 92, 246, 0.3);
+            
+            --background-primary: #000000;
+            --background-secondary: #0F0F0F;
+            --background-tertiary: #1A1A1A;
+            --surface-dark: #2A2A2A;
+            
+            --text-primary: #FFFFFF;
+            --text-secondary: #A1A1AA;
+            --text-muted: #6B7280;
+            
+            --animation-speed: 0.3s;
+            --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+            --bounce-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        body {
+            height: 100vh;
+            max-height: 100vh;
+            background: var(--background-primary);
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 300;
+            letter-spacing: -0.01em;
+            overflow: hidden;
+            position: relative;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        /* Window Controls */
+        .window-controls {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            gap: 8px;
+            z-index: 1000;
+        }
+
+        .window-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity var(--animation-speed) var(--animation-easing);
+        }
+
+        .window-btn:hover { opacity: 1; }
+        .window-btn.minimize { background: #ffbd2e; }
+        .window-btn.maximize { background: #28ca42; }
+        .window-btn.close { background: #ff5f57; }
+
+        /* Main Container */
+        .login-container {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Top-Left Title Section */
+        .title-section {
+            position: absolute;
+            top: 3rem;
+            left: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            z-index: 10;
+        }
+
+        .juniper-image {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            transition: transform var(--animation-speed) var(--animation-easing);
+            filter: brightness(1.1) drop-shadow(0 0 20px var(--purple-glow));
+            cursor: pointer;
+            transform-origin: center center;
+        }
+
+        /* Wobble Animation on Hover - Single play */
+        .juniper-image:hover {
+            animation: wobble 0.8s ease-in-out;
+        }
+
+        @keyframes wobble {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-3deg) scale(1.02); }
+            50% { transform: rotate(3deg) scale(1.05); }
+            75% { transform: rotate(-2deg) scale(1.02); }
+            100% { transform: rotate(0deg) scale(1); }
+        }
+
+        .main-title {
+            font-size: 4.5rem;
+            font-weight: 500;
+            font-family: 'Space Grotesk', system-ui, sans-serif;
+            letter-spacing: 0.02em;
+            line-height: 1.2;
+            color: #FFFFFF;
+            text-shadow: 0 0 30px var(--purple-glow);
+            padding-bottom: 0.2em;
+            overflow: visible;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            text-transform: uppercase;
+        }
+
+        /* Character Animation for Dialogue Effect - Smooth Fade In */
+        .char {
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.3s var(--animation-easing);
+            display: inline-block;
+            position: relative;
+            color: #FFFFFF;
+            line-height: 1.2;
+            padding-bottom: 0.1em;
+            z-index: 1;
+        }
+
+        .char.visible {
+            opacity: 1;
+            transform: translateY(0);
+            color: #FFFFFF;
+        }
+        
+        /* Enhanced glow effect for characters */
+        .char.visible::before {
+            content: attr(data-char);
+            position: absolute;
+            top: 0;
+            left: 0;
+            color: var(--light-purple);
+            filter: blur(8px);
+            opacity: 0.4;
+            z-index: -1;
+            animation: charGlow 0.8s ease-out;
+        }
+        
+        @keyframes charGlow {
+            0% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 0.8; transform: scale(1.2); }
+            100% { opacity: 0.4; transform: scale(1); }
+        }
+
+        /* Typing Cursor */
+        .typing-cursor {
+            display: inline-block;
+            color: var(--light-purple);
+            font-weight: 300;
+            margin-left: 2px;
+            animation: cursorBlink 1s infinite;
+            transition: opacity 0.3s ease;
+        }
+
+        @keyframes cursorBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Bottom-Right Login Form */
+        .login-form-container {
+            position: absolute;
+            bottom: 3rem;
+            right: 3rem;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 2.5rem;
+            min-width: 350px;
+            transform: translateY(100px);
+            opacity: 0;
+            /* Animation will be triggered by JavaScript after dialogue */
+        }
+        
+        .login-form-container.visible {
+            animation: slideInUp 0.8s var(--animation-easing) forwards;
+        }
+
+        @keyframes slideInUp {
+            0% {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--light-purple);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            transition: color var(--animation-speed) var(--animation-easing);
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px 16px;
+            background: transparent;
+            border: 1px solid #FFFFFF;
+            border-radius: 4px;
+            color: #FFFFFF;
+            font-size: 0.9rem;
+            font-weight: 400;
+            font-family: 'Segoe UI', 'SF Pro Text', system-ui, -apple-system, sans-serif;
+            transition: none;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border: 1px solid #FFFFFF;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .input-group input:focus + label,
+        .input-group input:valid + label {
+            color: #FFFFFF;
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Enhanced Button Styling */
+        .login-btn, .btn {
+            width: 100%;
+            padding: 16px 24px;
+            background: var(--primary-purple);
+            border: none;
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--animation-speed) var(--animation-easing);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 8px 25px var(--purple-glow),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            margin: 0.3rem 0;
+        }
+
+        .login-btn::before, .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .login-btn:hover, .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 12px 35px var(--purple-glow),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .login-btn:hover::before, .btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:active, .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .login-btn:disabled, .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Setup Steps Container (Hidden Initially) */
+        .setup-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-primary);
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem;
+            z-index: 200;
+        }
+
+        .setup-container.visible {
+            display: flex;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+
+        .setup-form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            gap: 3rem;
+        }
+
+        /* Progress Section */
+        .progress-section {
+            width: 100%;
+            max-width: 700px;
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+            flex-shrink: 0;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .step-indicator {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .progress-dots {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .progress-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            transform: scale(1);
+        }
+
+        .progress-dot.completed {
+            background: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            transform: scale(1.2);
+        }
+
+        .progress-dot.active {
+            background: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            animation: pulse 2s infinite;
+            transform: scale(1.3);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: -1;
+        }
+
+        /* Content Section */
+        .content-section {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+            flex: 1;
+            overflow: hidden;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step {
+            display: none;
+            flex: 1;
+            overflow: hidden;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .step.active {
+            display: flex;
+            animation: stepFadeIn 0.5s ease-out;
+        }
+
+        @keyframes stepFadeIn {
+            0% { opacity: 0; transform: translateY(-30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes stepFadeOut {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(50px); }
+        }
+        
+        .step.fade-out {
+            animation: stepFadeOut 0.5s ease-in forwards;
+        }
+
+        .step-title {
+            font-size: 2rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .step-description {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        /* Folder Selection */
+        .folder-path {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 1rem 0;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 0.8rem;
+            word-break: break-all;
+            opacity: 0.8;
+        }
+
+        /* Theme Selection */
+        .theme-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        .theme-option {
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.02);
+            text-align: center;
+        }
+
+        .theme-option:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .theme-option.selected {
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .theme-preview {
+            width: 100%;
+            height: 30px;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .theme-light .theme-preview {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .theme-dark .theme-preview {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+
+        .theme-system .theme-preview {
+            background: linear-gradient(135deg, #374151 0%, #6b7280 100%);
+        }
+
+        .theme-name {
+            font-size: 0.9rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        /* Loading Animation */
+        .loading-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1rem;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        /* Completion */
+        .completion-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .completion-check {
+            width: 60px;
+            height: 60px;
+            border: 2px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: checkPulse 2s infinite;
+        }
+
+        @keyframes checkPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+
+        /* Error States */
+        .input-group.error input {
+            background: transparent;
+            border: 1px solid #D4697A;
+        }
+
+        .error-message {
+            color: #D4697A;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all var(--animation-speed) var(--animation-easing);
+        }
+
+        .error-message.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Enhanced shake animation */
+        .shake {
+            animation: enhancedShake 0.6s ease-in-out;
+        }
+        
+        @keyframes enhancedShake {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            10% { transform: translateX(-8px) translateY(-2px); }
+            20% { transform: translateX(8px) translateY(2px); }
+            30% { transform: translateX(-6px) translateY(-1px); }
+            40% { transform: translateX(6px) translateY(1px); }
+            50% { transform: translateX(-4px) translateY(-1px); }
+            60% { transform: translateX(4px) translateY(1px); }
+            70% { transform: translateX(-2px) translateY(0); }
+            80% { transform: translateX(2px) translateY(0); }
+            90% { transform: translateX(-1px) translateY(0); }
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--surface-dark);
+            border-top: 3px solid var(--primary-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .juniper-image:hover {
+                animation: none;
+                transform: scale(1.05);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Window Controls -->
+    <div class="window-controls">
+        <button class="window-btn minimize" onclick="window.electronAPI?.windowMinimize?.()"></button>
+        <button class="window-btn maximize" onclick="window.electronAPI?.windowMaximize?.()"></button>
+        <button class="window-btn close" onclick="window.electronAPI?.windowClose?.()"></button>
+    </div>
+
+    <!-- Login Container -->
+    <div class="login-container" id="loginContainer">
+        <!-- Top-Left Title Section -->
+        <div class="title-section">
+            <img src="../assets/juniper.png" alt="Juniper" class="juniper-image" id="juniperImage">
+            <h1 class="main-title" id="mainTitle">Start organizing</h1>
+        </div>
+
+        <!-- Bottom-Right Login Form -->
+        <div class="login-form-container" id="loginForm">
+            <h2 class="form-title" id="formTitle" style="display: none;">Welcome Back</h2>
+            
+            <form id="authForm">
+                <div class="input-group" id="usernameGroup">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                    <div class="error-message" id="usernameError"></div>
+                </div>
+                
+                <div class="input-group" id="passwordGroup">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+                
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span id="btnText">Sign In</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Setup Container (Initially Hidden) -->
+    <div class="setup-container" id="setupContainer">
+
+        <!-- Setup Form Container -->
+        <div class="setup-form-container">
+            <!-- Progress Section -->
+            <div class="progress-section">
+                <div class="progress-header">
+                    <div class="step-indicator">
+                        <span id="stepCounter">Step 1 of 4</span>
+                    </div>
+            </div>
+            
+                <div class="progress-dots" style="position: relative;">
+                    <div class="progress-line"></div>
+                    <div class="progress-dot active" id="dot1"></div>
+                    <div class="progress-dot" id="dot2"></div>
+                    <div class="progress-dot" id="dot3"></div>
+                    <div class="progress-dot" id="dot4"></div>
+                </div>
+            </div>
+
+            <!-- Content Section -->
+            <div class="content-section">
+            <!-- Step 1: Processing -->
+            <div class="step active" id="step1">
+                <h2 class="step-title">Setting Up</h2>
+                <p class="step-description">Preparing your workspace and verifying credentials</p>
+                
+                <div class="loading-step">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text" id="loadingText">Initializing...</div>
+                </div>
+            </div>
+
+            <!-- Step 2: Folder Selection -->
+            <div class="step" id="step2">
+                <h2 class="step-title">Sample Library</h2>
+                <p class="step-description">Choose where your audio samples are stored</p>
+                
+                <button class="btn" onclick="selectFolder()">Select Folder</button>
+                <div class="folder-path" id="selectedPath">No folder selected</div>
+                <button class="btn" onclick="nextStep()" id="folderNextBtn" disabled>Continue</button>
+            </div>
+
+            <!-- Step 3: Theme Selection -->
+            <div class="step" id="step3">
+                <h2 class="step-title">Appearance</h2>
+                <p class="step-description">Choose your preferred theme</p>
+                
+                <div class="theme-options">
+                    <div class="theme-option theme-light" onclick="selectTheme('light')">
+                        <div class="theme-preview"></div>
+                        <div class="theme-name">Light</div>
+                    </div>
+                    <div class="theme-option theme-dark selected" onclick="selectTheme('dark')">
+                        <div class="theme-preview"></div>
+                        <div class="theme-name">Dark</div>
+                    </div>
+                    <div class="theme-option theme-system" onclick="selectTheme('system')">
+                        <div class="theme-preview"></div>
+                        <div class="theme-name">Auto</div>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="nextStep()">Continue</button>
+            </div>
+
+            <!-- Step 4: Complete -->
+            <div class="step" id="step4">
+                <h2 class="step-title">Ready</h2>
+                <p class="step-description">Your sample organizer is configured and ready to use</p>
+                
+                <div class="completion-step">
+                    <div class="completion-check">✓</div>
+                    <button class="btn" onclick="launchApp()">Launch Juniper</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script>
+        class JuniperLoginSystem {
+            constructor() {
+                this.currentState = 'login';
+                this.currentStep = 1;
+                this.totalSteps = 4;
+                this.isAnimating = false;
+                this.dialogueInterval = null;
+                this.preloadedImages = {};
+                this.selectedFolder = null;
+                this.selectedTheme = 'dark';
+                
+                this.init();
+            }
+
+            async init() {
+                await this.preloadImages();
+                this.setupEventListeners();
+                this.setupFormValidation();
+                
+                // Initialize with login state
+                this.setState('login');
+                
+                // Start dialogue animation immediately on page load
+                await this.startDialogueAnimation();
+            }
+
+            async preloadImages() {
+                const imagePaths = [
+                    '../assets/juniper.png',
+                    '../assets/junipertalk.png',
+                    '../assets/juniperopen.png'
+                ];
+
+                const loadPromises = imagePaths.map(path => {
+                    return new Promise((resolve, reject) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            this.preloadedImages[path] = img;
+                            resolve(img);
+                        };
+                        img.onerror = () => {
+                            console.warn(`Failed to preload image: ${path}`);
+                            resolve(null);
+                        };
+                        img.src = path;
+                    });
+                });
+
+                try {
+                    await Promise.all(loadPromises);
+                    console.log('Images preloaded successfully');
+                } catch (error) {
+                    console.warn('Some images failed to preload:', error);
+                }
+            }
+
+            setupEventListeners() {
+                const form = document.getElementById('authForm');
+                const juniperImage = document.getElementById('juniperImage');
+                
+                form.addEventListener('submit', (e) => this.handleFormSubmit(e));
+                
+                juniperImage.addEventListener('mouseenter', () => this.handleImageHover(true));
+                juniperImage.addEventListener('mouseleave', () => this.handleImageHover(false));
+                
+                ['username', 'password'].forEach(field => {
+                    const input = document.getElementById(field);
+                    input.addEventListener('blur', () => this.validateField(field));
+                    input.addEventListener('input', () => this.clearError(field));
+                });
+            }
+
+            setupFormValidation() {
+                let validationTimeout;
+                
+                ['username', 'password'].forEach(field => {
+                    const input = document.getElementById(field);
+                    input.addEventListener('input', () => {
+                        clearTimeout(validationTimeout);
+                        validationTimeout = setTimeout(() => {
+                            this.validateField(field);
+                        }, 300);
+                    });
+                });
+            }
+
+            handleImageHover(isHovering) {
+                const image = document.getElementById('juniperImage');
+                
+                if (isHovering && !this.isAnimating) {
+                    image.style.cursor = 'pointer';
+                    // Change to juniperopen.png on hover
+                    const hoverPath = '../assets/juniperopen.png';
+                    if (this.preloadedImages[hoverPath]) {
+                        image.src = hoverPath;
+                    } else {
+                        image.onerror = () => {
+                            console.warn(`Image not found: ${hoverPath}, using default`);
+                            image.src = '../assets/juniper.png';
+                        };
+                        image.src = hoverPath;
+                    }
+                } else {
+                    image.style.cursor = 'default';
+                    // Change back to default image
+                    image.src = '../assets/juniper.png';
+                }
+            }
+
+            async handleFormSubmit(e) {
+                e.preventDefault();
+                
+                if (this.isAnimating) return;
+                
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value.trim();
+                
+                const isUsernameValid = this.validateField('username');
+                const isPasswordValid = this.validateField('password');
+                
+                if (!isUsernameValid || !isPasswordValid) {
+                    this.shakeForm();
+                    return;
+                }
+
+                await this.handleFinalSubmission(username, password);
+            }
+
+            validateField(fieldName) {
+                const input = document.getElementById(fieldName);
+                const value = input.value.trim();
+                const group = document.getElementById(`${fieldName}Group`);
+                const errorElement = document.getElementById(`${fieldName}Error`);
+                
+                let isValid = true;
+                let errorMessage = '';
+
+                switch (fieldName) {
+                    case 'username':
+                        if (!value) {
+                            isValid = false;
+                            errorMessage = 'Username is required';
+                        }
+                        break;
+                        
+                    case 'password':
+                        if (!value) {
+                            isValid = false;
+                            errorMessage = 'Password is required';
+                        }
+                        break;
+                }
+
+                if (isValid) {
+                    group.classList.remove('error');
+                    errorElement.textContent = '';
+                    errorElement.classList.remove('visible');
+                } else {
+                    group.classList.add('error');
+                    errorElement.textContent = errorMessage;
+                    errorElement.classList.add('visible');
+                }
+
+                return isValid;
+            }
+
+            clearError(fieldName) {
+                const group = document.getElementById(`${fieldName}Group`);
+                const errorElement = document.getElementById(`${fieldName}Error`);
+                
+                group.classList.remove('error');
+                errorElement.classList.remove('visible');
+            }
+
+            async startDialogueAnimation() {
+                const titleElement = document.getElementById('mainTitle');
+                const originalText = 'Start organizing.';
+                
+                titleElement.innerHTML = '';
+                
+                // Add cursor element
+                const cursor = document.createElement('span');
+                cursor.className = 'typing-cursor';
+                cursor.textContent = '|';
+                
+                const chars = originalText.split('').map(char => {
+                    const span = document.createElement('span');
+                    span.className = 'char';
+                    const displayChar = char === ' ' ? '\u00A0' : char;
+                    span.textContent = displayChar;
+                    span.setAttribute('data-char', displayChar);
+                    span.style.opacity = '0';
+                    return span;
+                });
+                
+                chars.forEach(span => titleElement.appendChild(span));
+                titleElement.appendChild(cursor);
+                
+                // Random typing speeds and pauses for more natural feel
+                for (let i = 0; i < chars.length; i++) {
+                    const char = chars[i];
+                    
+                    // Only switch image for actual letters, not spaces or punctuation
+                    if (char.textContent !== '\u00A0' && char.textContent !== '.') {
+                        this.switchImage('talk');
+                    }
+                    
+                    // Typewriter reveal with opacity animation
+                    char.style.opacity = '1';
+                    char.classList.add('visible');
+                    
+                    // Variable typing speed for more natural feel
+                    const isSpace = char.textContent === '\u00A0';
+                    const isPunctuation = char.textContent === '.';
+                    let typingDelay;
+                    
+                    if (isSpace) {
+                        typingDelay = 50; // Shorter for spaces
+                    } else if (isPunctuation) {
+                        typingDelay = 200; // Longer pause for punctuation
+                    } else {
+                        // Random speed for letters (80-150ms)
+                        typingDelay = 80 + Math.random() * 70;
+                    }
+                    
+                    await this.delay(typingDelay);
+                    
+                    if (char.textContent !== '\u00A0' && char.textContent !== '.') {
+                        this.switchImage('default');
+                    }
+                    
+                    // Small pause between characters (except spaces)
+                    if (!isSpace) {
+                        await this.delay(20 + Math.random() * 30);
+                    }
+                    
+                    // Occasional longer pauses for more realistic typing
+                    if (Math.random() < 0.1 && !isSpace) {
+                        await this.delay(100 + Math.random() * 200);
+                    }
+                }
+                
+                // Keep cursor blinking for a moment
+                await this.delay(800);
+                
+                // Remove cursor and show form
+                cursor.style.opacity = '0';
+                await this.delay(200);
+                this.showLoginForm();
+            }
+
+            switchImage(state) {
+                const image = document.getElementById('juniperImage');
+                const imagePath = state === 'talk' 
+                    ? '../assets/junipertalk.png' 
+                    : '../assets/juniper.png';
+                
+                if (this.preloadedImages[imagePath]) {
+                    image.src = imagePath;
+                } else {
+                    image.onerror = () => {
+                        console.warn(`Image not found: ${imagePath}, using default`);
+                        image.src = '../assets/juniper.png';
+                    };
+                    image.src = imagePath;
+                }
+            }
+
+            showLoginForm() {
+                const loginForm = document.getElementById('loginForm');
+                loginForm.classList.add('visible');
+            }
+
+            async showVerifyingCredentials() {
+                // Update form title to show verifying status
+                const formTitle = document.getElementById('formTitle');
+                const originalTitle = formTitle.textContent;
+                const loginBtn = document.getElementById('loginBtn');
+                const inputs = document.querySelectorAll('#authForm input');
+                
+                // Disable form elements
+                loginBtn.disabled = true;
+                inputs.forEach(input => input.disabled = true);
+                
+                // Show verifying animation
+                formTitle.textContent = 'Verifying...';
+                loginBtn.innerHTML = '<div class="loading-spinner" style="width: 16px; height: 16px; margin: 0 auto;"></div>';
+                
+                // Simulate verification process
+                const verifyingTexts = [
+                    'Verifying...',
+                    'Checking credentials...',
+                    'Authenticating...',
+                    'Success!'
+                ];
+                
+                for (let i = 0; i < verifyingTexts.length; i++) {
+                    formTitle.textContent = verifyingTexts[i];
+                    await this.delay(800);
+                }
+                
+                // Brief pause before transitioning
+                await this.delay(500);
+            }
+
+            async handleFinalSubmission(username, password) {
+                this.showLoading(true);
+                
+                try {
+                    await this.delay(1500);
+                    const authResult = await this.authenticateUser(username, password);
+                    
+                    if (authResult.success) {
+                        await this.handleSuccessfulAuth(authResult);
+                    } else {
+                        this.handleAuthError(authResult.error);
+                    }
+                } catch (error) {
+                    this.handleAuthError('Authentication failed. Please try again.');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async authenticateUser(username, password) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        if (username === '1' && password === '1') {
+                            resolve({ success: true, user: { username } });
+                        } else {
+                            resolve({ success: false, error: 'Invalid credentials' });
+                        }
+                    }, 1000);
+                });
+            }
+
+            async handleSuccessfulAuth(authResult) {
+                // Show verifying credentials sequence before transitioning to setup
+                await this.showVerifyingCredentials();
+                // Then transition to setup steps
+                await this.transitionToSetup();
+            }
+
+            async transitionToSetup() {
+                // Hide login container
+                document.getElementById('loginContainer').style.display = 'none';
+                
+                // Show setup container
+                document.getElementById('setupContainer').classList.add('visible');
+                
+                // Start setup process
+                this.updateProgress();
+                this.simulateLoading();
+            }
+
+            handleAuthError(errorMessage) {
+                const passwordGroup = document.getElementById('passwordGroup');
+                const errorElement = document.getElementById('passwordError');
+                
+                passwordGroup.classList.add('error');
+                errorElement.textContent = errorMessage;
+                errorElement.classList.add('visible');
+                
+                this.shakeForm();
+                
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+            }
+
+            shakeForm() {
+                const form = document.getElementById('loginForm');
+                form.classList.add('shake');
+                
+                setTimeout(() => {
+                    form.classList.remove('shake');
+                }, 600);
+            }
+
+            setState(newState) {
+                this.currentState = newState;
+                document.body.className = `${newState}-screen`;
+            }
+
+            showLoading(show) {
+                const overlay = document.getElementById('loadingOverlay');
+                const btn = document.getElementById('loginBtn');
+                
+                overlay.style.display = show ? 'flex' : 'none';
+                btn.disabled = show;
+            }
+
+            // Setup Steps Functions
+            updateProgress() {
+                document.getElementById('stepCounter').textContent = `Step ${this.currentStep} of ${this.totalSteps}`;
+                
+                for (let i = 1; i <= this.totalSteps; i++) {
+                    const dot = document.getElementById(`dot${i}`);
+                    dot.classList.remove('active', 'completed');
+                    
+                    if (i < this.currentStep) {
+                        dot.classList.add('completed');
+                    } else if (i === this.currentStep) {
+                        dot.classList.add('active');
+                    }
+                }
+            }
+
+            simulateLoading() {
+                const loadingTexts = [
+                    'Initializing...',
+                    'Verifying credentials...',
+                    'Setting up workspace...',
+                    'Loading preferences...',
+                    'Complete'
+                ];
+
+                let index = 0;
+                const interval = setInterval(() => {
+                    document.getElementById('loadingText').textContent = loadingTexts[index];
+                    index++;
+                    
+                    if (index >= loadingTexts.length) {
+                        clearInterval(interval);
+                        setTimeout(() => this.nextStep(), 500);
+                    }
+                }, 800);
+            }
+
+            async nextStep() {
+                if (this.currentStep === 2 && !this.selectedFolder) {
+                    alert('Please select a sample folder');
+                    return;
+                }
+
+                // Add fade-out animation to current step
+                const currentStepElement = document.getElementById(`step${this.currentStep}`);
+                currentStepElement.classList.add('fade-out');
+                
+                // Wait for fade-out animation to complete
+                await this.delay(500);
+                
+                // Remove current step
+                currentStepElement.classList.remove('active', 'fade-out');
+                
+                this.currentStep++;
+                this.updateProgress();
+
+                // Add next step with fade-in animation
+                if (this.currentStep <= this.totalSteps) {
+                    const nextStepElement = document.getElementById(`step${this.currentStep}`);
+                    nextStepElement.classList.add('active');
+                }
+
+                // Step 4 is the final step - user clicks Launch Juniper manually
+            }
+
+            async selectFolder() {
+                try {
+                    const result = await window.electronAPI?.selectSampleFolder?.();
+                    if (result && result.path) {
+                        this.selectedFolder = result.path;
+                        document.getElementById('selectedPath').textContent = result.path;
+                        document.getElementById('folderNextBtn').disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Error selecting folder:', error);
+                    alert('Error selecting folder. Please try again.');
+                }
+            }
+
+            selectTheme(theme) {
+                this.selectedTheme = theme;
+                document.querySelectorAll('.theme-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                document.querySelector(`.theme-${theme}`).classList.add('selected');
+            }
+
+            async launchApp() {
+                console.log('launchApp() called!');
+                
+                try {
+                    const config = {
+                        username: document.getElementById('username').value,
+                        sampleFolder: this.selectedFolder,
+                        theme: this.selectedTheme,
+                        setupCompleted: true,
+                        setupDate: new Date().toISOString()
+                    };
+
+                    console.log('Setup completed with config:', config);
+                    
+                    // Try Electron API first, then fallback to redirect
+                    if (window.electronAPI?.launchMainApp) {
+                        console.log('Launching via Electron API...');
+                        await window.electronAPI.saveSetupConfig?.(config);
+                        await window.electronAPI.launchMainApp();
+                    } else {
+                        console.log('Electron API not available, redirecting to main app...');
+                        // Redirect to the main app
+                        window.location.href = 'index.html';
+                    }
+                } catch (error) {
+                    console.error('Error launching app:', error);
+                    // Fallback to redirect if Electron APIs fail
+                    console.log('Falling back to redirect...');
+                    window.location.href = 'index.html';
+                }
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        // Setup step functions for global access
+        function nextStep() {
+            window.juniperLogin.nextStep();
+        }
+
+        function selectFolder() {
+            window.juniperLogin.selectFolder();
+        }
+
+        function selectTheme(theme) {
+            window.juniperLogin.selectTheme(theme);
+        }
+
+        function launchApp() {
+            window.juniperLogin.launchApp();
+        }
+
+        // Initialize the login system when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.juniperLogin = new JuniperLoginSystem();
+        });
+
+        // Error prevention for missing images
+        document.addEventListener('error', (e) => {
+            if (e.target.tagName === 'IMG') {
+                console.warn('Image failed to load:', e.target.src);
+                e.target.src = '../assets/juniper.png';
+            }
+        }, true);
+    </script>
+</body>
+</html>

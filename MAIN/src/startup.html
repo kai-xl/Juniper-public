@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sample Organizer - Setup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            max-height: 100vh;
+            background: #000000;
+            color: #ffffff;
+            font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 300;
+            font-feature-settings: 'ss01', 'ss02';
+            letter-spacing: -0.015em;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .window-controls {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .window-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+
+        .window-btn:hover { opacity: 1; }
+        .window-btn.minimize { background: #ffbd2e; }
+        .window-btn.maximize { background: #28ca42; }
+        .window-btn.close { background: #ff5f57; }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+            padding: 1rem;
+            position: relative;
+            max-height: 100vh;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .logo-section {
+            text-align: center;
+            animation: fadeInUp 0.8s ease-out;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+            filter: brightness(1.1);
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.6;
+            font-weight: 300;
+        }
+
+        /* Progress Section */
+        .progress-section {
+            width: 100%;
+            max-width: 500px;
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+            flex-shrink: 0;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .step-indicator {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            font-weight: 300;
+        }
+
+        .progress-dots {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .progress-dot.completed {
+            background: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .progress-dot.active {
+            background: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: -1;
+        }
+
+        /* Content Section */
+        .content-section {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+            flex: 1;
+            overflow: hidden;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step {
+            display: none;
+            flex: 1;
+            overflow: hidden;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .step.active {
+            display: flex;
+            animation: stepFadeIn 0.5s ease-out;
+        }
+
+        @keyframes stepFadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .step-description {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        /* Form Elements */
+        .input-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 300;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 300;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            margin: 0.3rem;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn:disabled:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: none;
+        }
+
+        /* Folder Selection */
+        .folder-path {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 1rem 0;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', Monaco, 'Roboto Mono', ui-monospace, monospace;
+            font-size: 0.8rem;
+            word-break: break-all;
+            opacity: 0.8;
+        }
+
+        /* Theme Selection */
+        .theme-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        .theme-option {
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.02);
+            text-align: center;
+        }
+
+        .theme-option:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .theme-option.selected {
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .theme-preview {
+            width: 100%;
+            height: 30px;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .theme-light .theme-preview {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .theme-dark .theme-preview {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+
+        .theme-system .theme-preview {
+            background: linear-gradient(135deg, #374151 0%, #6b7280 100%);
+        }
+
+        .theme-name {
+            font-size: 0.9rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        /* Loading Animation */
+        .loading-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1rem;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        /* Completion */
+        .completion-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .completion-check {
+            width: 60px;
+            height: 60px;
+            border: 2px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: checkPulse 2s infinite;
+        }
+
+        @keyframes checkPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+
+
+        /* Animations */
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Design for Startup */
+        @media (max-height: 800px) {
+            .container {
+                padding: 0.8rem;
+            }
+            
+            .logo {
+                width: 50px;
+                height: 50px;
+                margin-bottom: 0.8rem;
+            }
+            
+            .title {
+                font-size: 1.8rem;
+                margin-bottom: 0.3rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .step-title {
+                font-size: 1.2rem;
+                margin-bottom: 0.6rem;
+            }
+            
+            .step-description {
+                font-size: 0.85rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .input-group {
+                margin-bottom: 0.8rem;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.85rem;
+            }
+            
+            .theme-option {
+                padding: 0.8rem;
+            }
+            
+            .theme-preview {
+                height: 25px;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .container {
+                padding: 0.6rem;
+            }
+            
+            .logo {
+                width: 40px;
+                height: 40px;
+                margin-bottom: 0.6rem;
+            }
+            
+            .title {
+                font-size: 1.6rem;
+                margin-bottom: 0.2rem;
+            }
+            
+            .subtitle {
+                font-size: 0.8rem;
+            }
+            
+            .step-title {
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .step-description {
+                font-size: 0.8rem;
+                margin-bottom: 0.6rem;
+            }
+            
+            .input-group {
+                margin-bottom: 0.6rem;
+            }
+            
+            .input-group input, .input-group select {
+                padding: 10px 14px;
+                font-size: 0.85rem;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+                font-size: 0.8rem;
+                margin: 0.2rem;
+            }
+            
+            .theme-options {
+                gap: 0.6rem;
+                margin: 0.8rem 0;
+            }
+            
+            .theme-option {
+                padding: 0.6rem;
+            }
+            
+            .theme-preview {
+                height: 20px;
+                margin-bottom: 0.3rem;
+            }
+            
+            .progress-header {
+                margin-bottom: 0.8rem;
+            }
+            
+            .progress-dots {
+                margin-bottom: 0.6rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .theme-options {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .progress-section {
+                max-width: 100%;
+            }
+            
+            .content-section {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="window-controls">
+        <button class="window-btn minimize" onclick="window.electronAPI?.windowMinimize?.()"></button>
+        <button class="window-btn maximize" onclick="window.electronAPI?.windowMaximize?.()"></button>
+        <button class="window-btn close" onclick="window.electronAPI?.windowClose?.()"></button>
+    </div>
+
+    <div class="container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <img src="../public/images/junipertalk.png" alt="Juniper" class="logo">
+            <h1 class="title">Juniper</h1>
+            <p class="subtitle">Intelligent Sample Organization</p>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="progress-section">
+            <div class="progress-header">
+                <div class="step-indicator">
+                    <span id="stepCounter">Step 1 of 5</span>
+                </div>
+            </div>
+            
+            <div class="progress-dots" style="position: relative;">
+                <div class="progress-line"></div>
+                <div class="progress-dot active" id="dot1"></div>
+                <div class="progress-dot" id="dot2"></div>
+                <div class="progress-dot" id="dot3"></div>
+                <div class="progress-dot" id="dot4"></div>
+                <div class="progress-dot" id="dot5"></div>
+            </div>
+        </div>
+
+        <!-- Content Section -->
+        <div class="content-section">
+            <!-- Step 1: Authentication -->
+            <div class="step active" id="step1">
+                <h2 class="step-title">Welcome</h2>
+                <p class="step-description">Set up your account to begin organizing your sample library</p>
+                
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter username" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter password" required>
+                </div>
+                
+                <button class="btn" onclick="nextStep()">Continue</button>
+            </div>
+
+            <!-- Step 2: Processing -->
+            <div class="step" id="step2">
+                <h2 class="step-title">Setting Up</h2>
+                <p class="step-description">Preparing your workspace and verifying credentials</p>
+                
+                <div class="loading-step">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text" id="loadingText">Initializing...</div>
+                </div>
+            </div>
+
+            <!-- Step 3: Folder Selection -->
+            <div class="step" id="step3">
+                <h2 class="step-title">Sample Library</h2>
+                <p class="step-description">Choose where your audio samples are stored</p>
+                
+                <button class="btn" onclick="selectFolder()">Select Folder</button>
+                <div class="folder-path" id="selectedPath">No folder selected</div>
+                <button class="btn" onclick="nextStep()" id="folderNextBtn" disabled>Continue</button>
+            </div>
+
+            <!-- Step 4: Theme Selection -->
+            <div class="step" id="step4">
+                <h2 class="step-title">Appearance</h2>
+                <p class="step-description">Choose your preferred theme</p>
+                
+                <div class="theme-options">
+                    <div class="theme-option theme-light" onclick="selectTheme('light')">
+                        <div class="theme-preview"></div>
+                        <div class="theme-name">Light</div>
+                    </div>
+                    <div class="theme-option theme-dark selected" onclick="selectTheme('dark')">
+                        <div class="theme-preview"></div>
+                        <div class="theme-name">Dark</div>
+                    </div>
+                    <div class="theme-option theme-system" onclick="selectTheme('system')">
+                        <div class="theme-preview"></div>
+                        <div class="theme-name">Auto</div>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="nextStep()">Continue</button>
+            </div>
+
+            <!-- Step 5: Complete -->
+            <div class="step" id="step5">
+                <h2 class="step-title">Ready</h2>
+                <p class="step-description">Your sample organizer is configured and ready to use</p>
+                
+                <div class="completion-step">
+                    <div class="completion-check">✓</div>
+                    <button class="btn" onclick="launchApp()">Launch Juniper</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedFolder = null;
+        let selectedTheme = 'dark';
+        const totalSteps = 5;
+
+        function updateProgress() {
+            document.getElementById('stepCounter').textContent = `Step ${currentStep} of ${totalSteps}`;
+            
+            // Update progress dots
+            for (let i = 1; i <= totalSteps; i++) {
+                const dot = document.getElementById(`dot${i}`);
+                dot.classList.remove('active', 'completed');
+                
+                if (i < currentStep) {
+                    dot.classList.add('completed');
+                } else if (i === currentStep) {
+                    dot.classList.add('active');
+                }
+            }
+        }
+
+        function nextStep() {
+            // Validation
+            if (currentStep === 1) {
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                if (!username || !password) {
+                    alert('Please fill in both fields');
+                    return;
+                }
+            }
+
+            if (currentStep === 3 && !selectedFolder) {
+                alert('Please select a sample folder');
+                return;
+            }
+            // Hide current step
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            
+            currentStep++;
+            updateProgress();
+
+            if (currentStep === 2) {
+                // Show loading step
+                document.getElementById('step2').classList.add('active');
+                simulateLoading();
+            } else if (currentStep <= totalSteps) {
+                document.getElementById(`step${currentStep}`).classList.add('active');
+            }
+
+            if (currentStep === 5) {
+                setTimeout(() => launchApp(), 2000);
+            }
+        }
+
+        function simulateLoading() {
+            const loadingTexts = [
+                'Initializing...',
+                'Verifying credentials...',
+                'Setting up workspace...',
+                'Loading preferences...',
+                'Complete'
+            ];
+
+            let index = 0;
+            const interval = setInterval(() => {
+                document.getElementById('loadingText').textContent = loadingTexts[index];
+                index++;
+                
+                if (index >= loadingTexts.length) {
+                    clearInterval(interval);
+                    setTimeout(() => nextStep(), 500);
+                }
+            }, 800);
+        }
+
+        async function selectFolder() {
+            try {
+                const result = await window.electronAPI?.selectSampleFolder?.();
+                if (result && result.path) {
+                    selectedFolder = result.path;
+                    document.getElementById('selectedPath').textContent = result.path;
+                    document.getElementById('folderNextBtn').disabled = false;
+                }
+            } catch (error) {
+                console.error('Error selecting folder:', error);
+                alert('Error selecting folder. Please try again.');
+            }
+        }
+
+        function selectTheme(theme) {
+            selectedTheme = theme;
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelector(`.theme-${theme}`).classList.add('selected');
+        }
+
+        async function launchApp() {
+            try {
+                const config = {
+                    username: document.getElementById('username').value,
+                    sampleFolder: selectedFolder,
+                    theme: selectedTheme,
+                    setupCompleted: true,
+                    setupDate: new Date().toISOString()
+                };
+
+                await window.electronAPI?.saveSetupConfig?.(config);
+                await window.electronAPI?.launchMainApp?.();
+            } catch (error) {
+                console.error('Error launching app:', error);
+                alert('Error launching application. Please try again.');
+            }
+        }
+
+        // Initialize
+        updateProgress();
+        document.getElementById('username').focus();
+    </script>
+</body>
+</html>

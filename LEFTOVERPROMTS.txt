@@ -1,0 +1,810 @@
+> make a color wheel for tags, along with custom icon support, and some default ones   
+  provided
+
+● I'll enhance the tag creation modal with a color wheel and add custom icon
+  support with default icons. Let me update the TagCreationModal component:
+
+● Update(MAIN\src\renderer.jsx)
+  ⎿  Updated MAIN\src\renderer.jsx with 79 addition
+      and 1 removal
+       635    const TagCreationModal = ({ isOpen,
+              onClose, onCreateTag }) => {
+       636      const [tagName, setTagName] =
+             useState('');
+       637      const [tagColor, setTagColor] =
+             useState('#8B5CF6');
+       638 +    const [tagIcon, setTagIcon] = 
+           + useState('tag');
+       639 +    const [colorMode, setColorMode] =
+           +  useState('presets'); // 'presets' 
+           + or 'wheel'
+       640
+       641      const colorOptions = [
+       642        '#8B5CF6', // Purple
+     ...
+       644        '#F59E0B', // Yellow
+       645        '#EC4899', // Pink
+       646        '#6366F1', // Indigo
+       647 -      '#84CC16'  // Lime
+       647 +      '#84CC16', // Lime
+       648 +      '#F97316', // Orange
+       649 +      '#06B6D4', // Cyan
+       650 +      '#8B5A2B', // Brown
+       651 +      '#6B7280'  // Gray
+       652      ];
+       653
+       654 +    const defaultIcons = [
+       655 +      { id: 'tag', name: 'Tag', svg: 
+           + (
+       656 +        <svg viewBox="0 0 24 24" 
+           + fill="none" stroke="currentColor" 
+           + strokeWidth="2">
+       657 +          <path d="M12 2H2v10l9.29 
+           + 9.29c.94.94 2.48.94 3.42 
+           + 0l6.58-6.58c.94-.94.94-2.48 
+           + 0-3.42L12 2Z"/>
+       658 +          <circle cx="7" cy="7" 
+           + r="1.5"/>
+       659 +        </svg>
+       660 +      )},
+       661 +      { id: 'music', name: 'Music', 
+           + svg: (
+       662 +        <svg viewBox="0 0 24 24" 
+           + fill="none" stroke="currentColor" 
+           + strokeWidth="2">
+       663 +          <path d="M9 18V5l12-2v13"/>
+       664 +          <circle cx="6" cy="18" 
+           + r="3"/>
+       665 +          <circle cx="18" cy="16" 
+           + r="3"/>
+       666 +        </svg>
+       667 +      )},
+       668 +      { id: 'drum', name: 'Drums', 
+           + svg: (
+       669 +        <svg viewBox="0 0 24 24" 
+           + fill="none" stroke="currentColor" 
+           + strokeWidth="2">
+       670 +          <ellipse cx="12" cy="5" 
+           + rx="9" ry="3"/>
+       671 +          <path d="M21 8c0 1.66-4.03 
+           + 3-9 3s-9-1.34-9-3"/>
+       672 +          <path d="M3 8v8c0 1.66 4.03
+           +  3 9 3s9-1.34 9-3V8"/>
+       673 +        </svg>
+       674 +      )},
+       675 +      { id: 'wave', name: 'Wave', 
+           + svg: (
+       676 +        <svg viewBox="0 0 24 24" 
+           + fill="none" stroke="currentColor" 
+           + strokeWidth="2">
+       677 +          <path d="M2 12c.5-1.5 1.5-3
+           +  3-3s2.5 1.5 3 3 1.5 3 3 3 2.5-1.5 
+           + 3-3 1.5-3 3-3 2.5 1.5 3 3"/>
+       678 +        </svg>
+       679 +      )},
+       680 +      { id: 'mic', name: 
+           + 'Microphone', svg: (
+       681 +        <svg viewBox="0 0 24 24" 
+           + fill="none" stroke="currentColor" 
+           + strokeWidth="2">
+       682 +          <path d="M12 2a3 3 0 00-3 
+           + 3v6a3 3 0 006 0V5a3 3 0 00-3-3z"/>
+       683 +          <path d="M19 10v2a7 7 0 
+           + 01-14 0v-2"/>
+       684 +          <line x1="12" y1="19" 
+           + x2="12" y2="23"/>
+       685 +          <line x1="8" y1="23" 
+           + x2="16" y2="23"/>
+       686 +        </svg>
+       687 +      )},
+       688 +      { id: 'headphones', name: 
+           + 'Headphones', svg: (
+       689 +        <svg viewBox="0 0 24 24" 
+           + fill="none" stroke="currentColor" 
+           + strokeWidth="2">
+       690 +          <path d="M3 18v-6a9 9 0 0 1
+           +  18 0v6"/>
+       691 +          <path d="M21 19a2 2 0 0 1-2
+           +  2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 
+           + 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 
+           + 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+       692 +        </svg>
+       693 +      )},
+       694 +      { id: 'star', name: 'Star', 
+           + svg: (
+       695 +        <svg viewBox="0 0 24 24" 
+           + fill="none" stroke="currentColor" 
+           + strokeWidth="2">
+       696 +          <polygon points="12,2 
+           + 15.09,8.26 22,9.27 17,14.14 
+           + 18.18,21.02 12,17.77 5.82,21.02 
+           + 7,14.14 2,9.27 8.91,8.26"/>
+       697 +        </svg>
+       698 +      )},
+       699 +      { id: 'heart', name: 'Heart', 
+           + svg: (
+       700 +        <svg viewBox="0 0 24 24" 
+           + fill="none" stroke="currentColor" 
+           + strokeWidth="2">
+       701 +          <path d="M20.84 4.61a5.5 
+           + 5.5 0 0 0-7.78 0L12 
+           + 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 
+           + 7.78l1.06 1.06L12 21.23l7.78-7.78 
+           + 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+       702 +        </svg>
+       703 +      )},
+       704 +      { id: 'zap', name: 'Lightning',
+           +  svg: (
+       705 +        <svg viewBox="0 0 24 24" 
+           + fill="none" stroke="currentColor" 
+           + strokeWidth="2">
+       706 +          <polygon points="13,2 3,14 
+           + 12,14 11,22 21,10 12,10 13,2"/>
+       707 +        </svg>
+       708 +      )},
+       709 +      { id: 'folder', name: 'Folder',
+           +  svg: (
+       710 +        <svg viewBox="0 0 24 24" 
+           + fill="none" stroke="currentColor" 
+           + strokeWidth="2">
+       711 +          <path d="M22 19a2 2 0 0 1-2
+           +  2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 
+           + 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+       712 +        </svg>
+       713 +      )},
+       714 +      { id: 'circle', name: 'Circle',
+           +  svg: (
+       715 +        <svg viewBox="0 0 24 24" 
+           + fill="none" stroke="currentColor" 
+           + strokeWidth="2">
+       716 +          <circle cx="12" cy="12" 
+           + r="10"/>
+       717 +        </svg>
+       718 +      )},
+       719 +      { id: 'square', name: 'Square',
+           +  svg: (
+       720 +        <svg viewBox="0 0 24 24" 
+           + fill="none" stroke="currentColor" 
+           + strokeWidth="2">
+       721 +          <rect x="3" y="3" 
+           + width="18" height="18" rx="2" 
+           + ry="2"/>
+       722 +        </svg>
+       723 +      )}
+       724 +    ];
+       725 +  
+       726      const handleCreate = () => {
+       727        if (tagName.trim() &&
+             tagName.trim().length <= 35) {
+       728          onCreateTag({ name:
+             tagName.trim(), color: tagColor });
+
+● Now let me update the handleCreate function to include the icon and update the       
+  preview:
+
+● Update(MAIN\src\renderer.jsx)
+  ⎿  Updated MAIN\src\renderer.jsx with 2 additions
+     and 1 removal
+       727
+       728      const handleCreate = () => {
+       729        if (tagName.trim() &&
+             tagName.trim().length <= 35) {
+       730 -        onCreateTag({ name: 
+           -  tagName.trim(), color: tagColor });
+       730 +        onCreateTag({ name: 
+           +  tagName.trim(), color: tagColor, 
+           +  icon: tagIcon });
+       731          setTagName('');
+       732          setTagColor('#8B5CF6');
+       733 +        setTagIcon('tag');
+       734          onClose();
+       735        }
+       736      };
+
+● Now let me update the tag preview to show the icon:
+
+● Update(MAIN\src\renderer.jsx)
+  ⎿  Updated MAIN\src\renderer.jsx with 9 additions
+     and 4 removals
+       790                  minWidth: '150px'
+       791                }}
+       792              >
+       793 -              <h3 style={{ fontSize: 
+           - '1.1rem', marginBottom: '0.3rem', 
+           - color: tagColor }}>
+       794 -                {tagName || 'Tag 
+           - Name'}
+       795 -              </h3>
+       796 -              <p style={{ opacity: 
+           - 0.7, fontSize: '0.8rem' }}>0 
+           - samples</p>
+       793 +              <div style={{ display: 
+           + 'flex', alignItems: 'center', 
+           + justifyContent: 'center', gap: 
+           + '0.5rem', marginBottom: '0.3rem' }}>
+       794 +                <div style={{ width: 
+           + '16px', height: '16px', color: 
+           + tagColor }}>
+       795 +
+           + {defaultIcons.find(icon => icon.id 
+           + === tagIcon)?.svg}
+       796 +                </div>
+       797 +                <h3 style={{ 
+           + fontSize: '1.1rem', margin: 0, 
+           + color: tagColor }}>
+       798 +                  {tagName || 'Tag 
+           + Name'}
+       799 +                </h3>
+       800 +              </div>
+       801 +              <p style={{ opacity: 
+           + 0.7, fontSize: '0.8rem', margin: 0 
+           + }}>0 samples</p>
+       802              </div>
+       803            </div>
+       804
+
+● Now let me replace the color selection section with both preset colors and a
+  color wheel:
+
+● Update(MAIN\src\renderer.jsx)
+  ⎿  Updated MAIN\src\renderer.jsx with 136
+     additions and 16 removals
+        840              />
+        841            </div>
+        842
+        843 -          {/* Color Selection */}
+        843 +          {/* Icon Selection */}
+        844            <div style={{
+              marginBottom: '2rem' }}>
+        845              <label style={{ display:
+               'block', marginBottom: '1rem',
+              fontSize: '0.9rem', opacity: 0.8
+              }}>
+        846 -              Tag Color
+        846 +              Tag Icon
+        847              </label>
+        848              <div style={{
+        849                display: 'grid',
+        850 -              gridTemplateColumns: 
+            -  'repeat(4, 1fr)',
+        851 -              gap: '0.8rem'
+        850 +              gridTemplateColumns: 
+            +  'repeat(6, 1fr)',
+        851 +              gap: '0.8rem',
+        852 +              maxHeight: '150px',
+        853 +              overflowY: 'auto',
+        854 +              padding: '0.5rem',
+        855 +              border: '1px solid 
+            + rgba(255, 255, 255, 0.1)',
+        856 +              borderRadius: '8px'
+        857              }}>
+        858 -              {colorOptions.map((
+            -  color) => (
+        858 +              {defaultIcons.map((
+            +  icon) => (
+        859                  <motion.div
+        860 -                  key={color}
+        860 +                  key={icon.id}
+        861                    whileHover={{
+              scale: 1.1 }}
+        862                    whileTap={{ scale:
+               0.95 }}
+        863                    style={{
+        864                      width: '40px',
+        865                      height: '40px',
+        866 -                    borderRadius: '
+            -  50%',
+        867 -                    background: 
+            - color,
+        866 +                    borderRadius: '
+            +  8px',
+        867 +                    background: 
+            + tagIcon === icon.id ? 
+            + `${tagColor}30` : 'rgba(255, 255, 
+            + 255, 0.05)',
+        868 +                    border: tagIcon 
+            + === icon.id ? `2px solid 
+            + ${tagColor}` : '1px solid rgba(255,
+            +  255, 255, 0.1)',
+        869                      cursor:
+              'pointer',
+        870 -                    border: tagColor
+            -  === color ? '3px solid white' : 
+            - '2px solid transparent',
+        870                      display: 'flex',
+        871                      alignItems:
+              'center',
+        872 -                    justifyContent: 
+            -  'center'
+        872 +                    justifyContent: 
+            +  'center',
+        873 +                    color: tagIcon 
+            + === icon.id ? tagColor : 'rgba(255,
+            +  255, 255, 0.7)'
+        874                    }}
+        875 -                  onClick={() => 
+            -  setTagColor(color)}
+        875 +                  onClick={() => 
+            +  setTagIcon(icon.id)}
+        876 +                  title={icon.name}
+        877                  >
+        878 -                  {tagColor === 
+            - color && (
+        879 -                    <svg width="16" 
+            - height="16" viewBox="0 0 24 24" 
+            - fill="none" stroke="white" 
+            - strokeWidth="3" 
+            - strokeLinecap="round" 
+            - strokeLinejoin="round">
+        880 -                      <polyline 
+            - points="20,6 9,17 4,12"/>
+        881 -                    </svg>
+        882 -                  )}
+        878 +                  <div style={{ 
+            + width: '20px', height: '20px' }}>
+        879 +                    {icon.svg}
+        880 +                  </div>
+        881                  </motion.div>
+        882                ))}
+        883              </div>
+        884            </div>
+        885
+        886 +          {/* Color Selection */}
+        887 +          <div style={{ 
+            + marginBottom: '2rem' }}>
+        888 +            <div style={{ display: 
+            + 'flex', alignItems: 'center', gap: 
+            + '1rem', marginBottom: '1rem' }}>
+        889 +              <label style={{ 
+            + fontSize: '0.9rem', opacity: 0.8 
+            + }}>
+        890 +                Tag Color
+        891 +              </label>
+        892 +              <div style={{ display:
+            +  'flex', gap: '0.5rem' }}>
+        893 +                <motion.button
+        894 +                  whileHover={{ 
+            + scale: 1.05 }}
+        895 +                  whileTap={{ scale:
+            +  0.95 }}
+        896 +                  onClick={() => 
+            + setColorMode('presets')}
+        897 +                  style={{
+        898 +                    padding: '4px 
+            + 8px',
+        899 +                    background: 
+            + colorMode === 'presets' ? tagColor 
+            + : 'rgba(255, 255, 255, 0.1)',
+        900 +                    border: 'none',
+        901 +                    borderRadius: 
+            + '4px',
+        902 +                    color: 'white',
+        903 +                    fontSize: 
+            + '0.8rem',
+        904 +                    cursor: 
+            + 'pointer'
+        905 +                  }}
+        906 +                >
+        907 +                  Presets
+        908 +                </motion.button>
+        909 +                <motion.button
+        910 +                  whileHover={{ 
+            + scale: 1.05 }}
+        911 +                  whileTap={{ scale:
+            +  0.95 }}
+        912 +                  onClick={() => 
+            + setColorMode('wheel')}
+        913 +                  style={{
+        914 +                    padding: '4px 
+            + 8px',
+        915 +                    background: 
+            + colorMode === 'wheel' ? tagColor : 
+            + 'rgba(255, 255, 255, 0.1)',
+        916 +                    border: 'none',
+        917 +                    borderRadius: 
+            + '4px',
+        918 +                    color: 'white',
+        919 +                    fontSize: 
+            + '0.8rem',
+        920 +                    cursor: 
+            + 'pointer'
+        921 +                  }}
+        922 +                >
+        923 +                  Wheel
+        924 +                </motion.button>
+        925 +              </div>
+        926 +            </div>
+        927 +  
+        928 +            {colorMode === 'presets'
+            +  ? (
+        929 +              <div style={{
+        930 +                display: 'grid',
+        931 +                gridTemplateColumns:
+            +  'repeat(6, 1fr)',
+        932 +                gap: '0.8rem'
+        933 +              }}>
+        934 +
+            + {colorOptions.map((color) => (
+        935 +                  <motion.div
+        936 +                    key={color}
+        937 +                    whileHover={{ 
+            + scale: 1.1 }}
+        938 +                    whileTap={{ 
+            + scale: 0.95 }}
+        939 +                    style={{
+        940 +                      width: '40px',
+        941 +                      height: 
+            + '40px',
+        942 +                      borderRadius: 
+            + '50%',
+        943 +                      background: 
+            + color,
+        944 +                      cursor: 
+            + 'pointer',
+        945 +                      border: 
+            + tagColor === color ? '3px solid 
+            + white' : '2px solid transparent',
+        946 +                      display: 
+            + 'flex',
+        947 +                      alignItems: 
+            + 'center',
+        948 +
+            + justifyContent: 'center'
+        949 +                    }}
+        950 +                    onClick={() => 
+            + setTagColor(color)}
+        951 +                  >
+        952 +                    {tagColor === 
+            + color && (
+        953 +                      <svg 
+            + width="16" height="16" viewBox="0 0
+            +  24 24" fill="none" stroke="white" 
+            + strokeWidth="3" 
+            + strokeLinecap="round" 
+            + strokeLinejoin="round">
+        954 +                        <polyline 
+            + points="20,6 9,17 4,12"/>
+        955 +                      </svg>
+        956 +                    )}
+        957 +                  </motion.div>
+        958 +                ))}
+        959 +              </div>
+        960 +            ) : (
+        961 +              <div style={{ display:
+            +  'flex', flexDirection: 'column', 
+            + alignItems: 'center', gap: '1rem' 
+            + }}>
+        962 +                <input
+        963 +                  type="color"
+        964 +                  value={tagColor}
+        965 +                  onChange={(e) => 
+            + setTagColor(e.target.value)}
+        966 +                  style={{
+        967 +                    width: '60px',
+        968 +                    height: '60px',
+        969 +                    borderRadius: 
+            + '50%',
+        970 +                    border: 'none',
+        971 +                    cursor: 
+            + 'pointer',
+        972 +                    background: 
+            + 'none'
+        973 +                  }}
+        974 +                />
+        975 +                <input
+        976 +                  type="text"
+        977 +                  value={tagColor}
+        978 +                  onChange={(e) => {
+        979 +                    const color = 
+            + e.target.value;
+        980 +                    if 
+            + (/^#[0-9A-F]{6}$/i.test(color)) {
+        981 +
+            + setTagColor(color);
+        982 +                    }
+        983 +                  }}
+        984 +
+            + placeholder="#8B5CF6"
+        985 +                  style={{
+        986 +                    width: '120px',
+        987 +                    padding: '8px 
+            + 12px',
+        988 +                    background: 
+            + 'rgba(255, 255, 255, 0.05)',
+        989 +                    border: '1px 
+            + solid rgba(255, 255, 255, 0.1)',
+        990 +                    borderRadius: 
+            + '6px',
+        991 +                    color: 'white',
+        992 +                    fontSize: 
+            + '0.9rem',
+        993 +                    textAlign: 
+            + 'center',
+        994 +                    fontFamily: 
+            + "'JetBrains Mono', monospace"
+        995 +                  }}
+        996 +                />
+        997 +              </div>
+        998 +            )}
+        999 +          </div>
+       1000 +  
+       1001            {/* Action Buttons */}
+       1002            <div style={{ display:
+              'flex', gap: '1rem',
+              justifyContent: 'flex-end' }}>
+       1003              <motion.button
+
+● Now I need to update the existing tags to include icon support and update the tag    
+   rendering to show icons:
+
+● Update(MAIN\src\renderer.jsx)
+  ⎿  Updated MAIN\src\renderer.jsx with 85 addition
+      and 12 removals
+       1044    const TagsPage = ({ onNavigate })
+              => {
+       1045      const [showCreateModal,
+              setShowCreateModal] =
+              useState(false);
+       1046      const [tags, setTags] =
+              useState([
+       1047 -      { name: 'Drums', color: '#
+            -  8B5CF6' },
+       1048 -      { name: 'Bass', color: '#
+            -  8B5CF6' },
+       1049 -      { name: 'Melody', color: '#
+            -  8B5CF6' },
+       1050 -      { name: 'Vocals', color: '#
+            -  8B5CF6' },
+       1051 -      { name: 'FX', color: '#8B5CF6'
+            -   },
+       1052 -      { name: 'Loops', color: '#
+            -  8B5CF6' },
+       1053 -      { name: 'Chords', color: 
+            -  '#8B5CF6' },
+       1054 -      { name: 'Arps', color: '#
+            -  8B5CF6' },
+       1055 -      { name: 'Leads', color: '#
+            -  8B5CF6' },
+       1056 -      { name: 'Pads', color: '#
+            -  8B5CF6' },
+       1057 -      { name: 'Percussion', color: 
+            -  '#8B5CF6' },
+       1058 -      { name: 'Ambient', color: '#
+            -  8B5CF6' }
+       1047 +      { name: 'Drums', color: '#
+            +  EF4444', icon: 'drum' },
+       1048 +      { name: 'Bass', color: '#
+            +  10B981', icon: 'wave' },
+       1049 +      { name: 'Melody', color: '#
+            +  3B82F6', icon: 'music' },
+       1050 +      { name: 'Vocals', color: '#
+            +  EC4899', icon: 'mic' },
+       1051 +      { name: 'FX', color: '#6366F1'
+            +  , icon: 'zap' },
+       1052 +      { name: 'Loops', color: '#
+            +  F59E0B', icon: 'circle' },
+       1053 +      { name: 'Chords', color: 
+            +  '#8B5CF6', icon: 'music' },
+       1054 +      { name: 'Arps', color: '#
+            +  06B6D4', icon: 'wave' },
+       1055 +      { name: 'Leads', color: '#
+            +  F97316', icon: 'star' },
+       1056 +      { name: 'Pads', color: '#
+            +  84CC16', icon: 'headphones' },
+       1057 +      { name: 'Percussion', color: 
+            +  '#8B5A2B', icon: 'drum' },
+       1058 +      { name: 'Ambient', color: '#
+            +  6B7280', icon: 'heart' }
+       1059      ]);
+       1060
+       1061 +    // Default icons for reference 
+            + (same as in modal)
+       1062 +    const defaultIcons = [
+       1063 +      { id: 'tag', name: 'Tag', svg:
+            +  (
+       1064 +        <svg viewBox="0 0 24 24" 
+            + fill="none" stroke="currentColor" 
+            + strokeWidth="2">
+       1065 +          <path d="M12 2H2v10l9.29 
+            + 9.29c.94.94 2.48.94 3.42 
+            + 0l6.58-6.58c.94-.94.94-2.48 
+            + 0-3.42L12 2Z"/>
+       1066 +          <circle cx="7" cy="7" 
+            + r="1.5"/>
+       1067 +        </svg>
+       1068 +      )},
+       1069 +      { id: 'music', name: 'Music', 
+            + svg: (
+       1070 +        <svg viewBox="0 0 24 24" 
+            + fill="none" stroke="currentColor" 
+            + strokeWidth="2">
+       1071 +          <path d="M9 
+            + 18V5l12-2v13"/>
+       1072 +          <circle cx="6" cy="18" 
+            + r="3"/>
+       1073 +          <circle cx="18" cy="16" 
+            + r="3"/>
+       1074 +        </svg>
+       1075 +      )},
+       1076 +      { id: 'drum', name: 'Drums', 
+            + svg: (
+       1077 +        <svg viewBox="0 0 24 24" 
+            + fill="none" stroke="currentColor" 
+            + strokeWidth="2">
+       1078 +          <ellipse cx="12" cy="5" 
+            + rx="9" ry="3"/>
+       1079 +          <path d="M21 8c0 1.66-4.03
+            +  3-9 3s-9-1.34-9-3"/>
+       1080 +          <path d="M3 8v8c0 1.66 
+            + 4.03 3 9 3s9-1.34 9-3V8"/>
+       1081 +        </svg>
+       1082 +      )},
+       1083 +      { id: 'wave', name: 'Wave', 
+            + svg: (
+       1084 +        <svg viewBox="0 0 24 24" 
+            + fill="none" stroke="currentColor" 
+            + strokeWidth="2">
+       1085 +          <path d="M2 12c.5-1.5 
+            + 1.5-3 3-3s2.5 1.5 3 3 1.5 3 3 3 
+            + 2.5-1.5 3-3 1.5-3 3-3 2.5 1.5 3 
+            + 3"/>
+       1086 +        </svg>
+       1087 +      )},
+       1088 +      { id: 'mic', name: 
+            + 'Microphone', svg: (
+       1089 +        <svg viewBox="0 0 24 24" 
+            + fill="none" stroke="currentColor" 
+            + strokeWidth="2">
+       1090 +          <path d="M12 2a3 3 0 00-3 
+            + 3v6a3 3 0 006 0V5a3 3 0 00-3-3z"/>
+       1091 +          <path d="M19 10v2a7 7 0 
+            + 01-14 0v-2"/>
+       1092 +          <line x1="12" y1="19" 
+            + x2="12" y2="23"/>
+       1093 +          <line x1="8" y1="23" 
+            + x2="16" y2="23"/>
+       1094 +        </svg>
+       1095 +      )},
+       1096 +      { id: 'headphones', name: 
+            + 'Headphones', svg: (
+       1097 +        <svg viewBox="0 0 24 24" 
+            + fill="none" stroke="currentColor" 
+            + strokeWidth="2">
+       1098 +          <path d="M3 18v-6a9 9 0 0 
+            + 1 18 0v6"/>
+       1099 +          <path d="M21 19a2 2 0 0 
+            + 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1
+            +  2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 
+            + 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+       1100 +        </svg>
+       1101 +      )},
+       1102 +      { id: 'star', name: 'Star', 
+            + svg: (
+       1103 +        <svg viewBox="0 0 24 24" 
+            + fill="none" stroke="currentColor" 
+            + strokeWidth="2">
+       1104 +          <polygon points="12,2 
+            + 15.09,8.26 22,9.27 17,14.14 
+            + 18.18,21.02 12,17.77 5.82,21.02 
+            + 7,14.14 2,9.27 8.91,8.26"/>
+       1105 +        </svg>
+       1106 +      )},
+       1107 +      { id: 'heart', name: 'Heart', 
+            + svg: (
+       1108 +        <svg viewBox="0 0 24 24" 
+            + fill="none" stroke="currentColor" 
+            + strokeWidth="2">
+       1109 +          <path d="M20.84 4.61a5.5 
+            + 5.5 0 0 0-7.78 0L12 
+            + 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 
+            + 7.78l1.06 1.06L12 21.23l7.78-7.78 
+            + 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+       1110 +        </svg>
+       1111 +      )},
+       1112 +      { id: 'zap', name: 
+            + 'Lightning', svg: (
+       1113 +        <svg viewBox="0 0 24 24" 
+            + fill="none" stroke="currentColor" 
+            + strokeWidth="2">
+       1114 +          <polygon points="13,2 3,14
+            +  12,14 11,22 21,10 12,10 13,2"/>
+       1115 +        </svg>
+       1116 +      )},
+       1117 +      { id: 'folder', name: 
+            + 'Folder', svg: (
+       1118 +        <svg viewBox="0 0 24 24" 
+            + fill="none" stroke="currentColor" 
+            + strokeWidth="2">
+       1119 +          <path d="M22 19a2 2 0 0 
+            + 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 
+            + 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+       1120 +        </svg>
+       1121 +      )},
+       1122 +      { id: 'circle', name: 
+            + 'Circle', svg: (
+       1123 +        <svg viewBox="0 0 24 24" 
+            + fill="none" stroke="currentColor" 
+            + strokeWidth="2">
+       1124 +          <circle cx="12" cy="12" 
+            + r="10"/>
+       1125 +        </svg>
+       1126 +      )},
+       1127 +      { id: 'square', name: 
+            + 'Square', svg: (
+       1128 +        <svg viewBox="0 0 24 24" 
+            + fill="none" stroke="currentColor" 
+            + strokeWidth="2">
+       1129 +          <rect x="3" y="3" 
+            + width="18" height="18" rx="2" 
+            + ry="2"/>
+       1130 +        </svg>
+       1131 +      )}
+       1132 +    ];
+       1133 +  
+       1134      const handleCreateTag = (newTag)
+               => {
+       1135        setTags([...tags, newTag]);
+       1136      };
+
+● Now let me update the tag rendering to display the icons:
+
+● Update(MAIN\src\renderer.jsx)
+  ⎿  Updated MAIN\src\renderer.jsx with 15 addition
+      and 10 removals
+       1241                      }}
+       1242                      transition={{
+              duration: 0.1 }}
+       1243                    >
+       1244 -                    <h3 style={{ 
+       1245 -                      fontSize: 
+            - '1.2rem', 
+       1246 -                      marginBottom: 
+            - '0.5rem', 
+       1247 -
+            -  color: tag.color,
+       1248 -                      wordBreak: 
+            - 'break-word',
+       1249 -                      hyphens: 
+            - 'auto',
+       1250 -                      lineHeight: 
+            - '1.3'
+       1251 -                    }}>
+       1252 -                      {tag.name}
+       1253 -                    </h3>
+       1244 +                    <div style={{ 
+            + display: 'flex', alignItems: 
+            + 'center', justifyContent: 'center',
+            +  gap: '0.5rem', marginBottom: 
+            + '0.5rem' }}>
+       1245 +                      <div style={{ 
+            + width: '20px', height: '20px', 
+            + color: tag.color }}>
+       1246 +
+            + {defaultIcons.find(icon => icon.id 
+            + === tag.icon)?.svg}
+       1247 +                      </div>
+       1248 +                      <h3 style={{ 
+       1249 +                        fontSize: 
+            + '1.2rem', 
+       1250 +                        margin: 0,
+       1251 +                        color: 
+            + tag.color,
+       1252 +                        wordBreak: 
+            + 'break-word',
+       1253 +                        hyphens: 
+            + 'auto',
+       1254 +                        lineHeight: 
+            + '1.3'
+       1255 +                      }}>
+       1256 +                        {tag.name}
+       1257 +                      </h3>
+       1258 +                    </div>
+       1259                      <p style={{
+              opacity: 0.7, fontSize: '0.9rem'
+              }}>0 samples</p>
+       1260                    </motion.div>
+       1261                  );
+  ⎿  5-hour limit reached ∙ resets 9pm
+     /upgrade to increase your usage limit.
+
+     resume your task.
